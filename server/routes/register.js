@@ -13,44 +13,6 @@ router.post(
     check("email", "L'email est invalide").isEmail(),
     check(
       "password",
-      "Le mot de passe doit contenir au moins 14 caractères"
-    ).isLength({ min: 14 }),
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty())
-      return res.status(400).json({ errors: errors.array() });
-
-    const { username, email, password } = req.body;
-
-    try {
-      let user = await User.findOne({ email });
-      if (user)
-        return res.status(400).json({ message: "Cet utilisateur existe déjà" });
-
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-
-      user = new User({ username, email, password: hashedPassword });
-      await user.save();
-
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
-
-      res.json({ token, user: { id: user._id, username, email } });
-    } catch (err) {
-      res.status(500).json({ message: "Erreur serveur", error: err });
-    }
-  }
-);
-router.post(
-  "/",
-  [
-    check("username", "Le nom d'utilisateur est requis").not().isEmpty(),
-    check("email", "L'email est invalide").isEmail(),
-    check(
-      "password",
       "Le mot de passe doit contenir au moins 6 caractères"
     ).isLength({ min: 6 }),
   ],

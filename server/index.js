@@ -3,6 +3,9 @@ const cors = require("cors");
 const app = express();
 const registerRoutes = require("./routes/register");
 const loginRoutes = require("./routes/login");
+const userRoutes = require("./routes/user");
+const mongoose = require("mongoose");
+
 require("dotenv").config();
 
 app.use(cors());
@@ -17,9 +20,6 @@ app.listen(PORT, () => {
   console.log(`Serveur démarré sur http://localhost:${PORT}`);
 });
 
-const mongoose = require("mongoose");
-require("dotenv").config();
-
 mongoose
   .connect(process.env.DB_URI, {
     useNewUrlParser: true,
@@ -30,3 +30,5 @@ mongoose
 
 app.use("/api/auth/register", registerRoutes);
 app.use("/api/auth/login", loginRoutes);
+app.use("/api/users", userRoutes);
+
