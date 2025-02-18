@@ -53,6 +53,7 @@ export const AuthProvider = ({ children }) => {
       .then((data) => {
         console.log("✅ Utilisateur connecté après login :", data);
         setUser(data);
+        console.log("data iciiiii", data);
       })
       .catch(() => {
         localStorage.removeItem("token");
