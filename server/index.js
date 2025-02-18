@@ -30,5 +30,5 @@ mongoose
 
 app.use("/api/auth/register", registerRoutes);
 app.use("/api/auth/login", loginRoutes);
-app.use("/api/users", userRoutes);
+app.use("/api/auth/user", userRoutes);
 

@@ -7,6 +7,8 @@ function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [description, setDescription] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -15,7 +17,7 @@ function Register() {
     const response = await fetch("http://localhost:5454/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password }),
+      body: JSON.stringify({ username, email, password, avatar, description }),
     });
 
     const data = await response.json();
@@ -60,7 +62,32 @@ function Register() {
               />
             </div>
             <div>
-              <label className="block text-gray-600 font-medium">Mot de passe</label>
+              <label className="block text-gray-600 font-medium">
+                Avatar (URL)
+              </label>
+              <input
+                type="text"
+                className="w-full p-3 border rounded-lg bg-gray-50 text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Entrez l'URL de votre avatar"
+                value={avatar}
+                onChange={(e) => setAvatar(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-600 font-medium">
+                Description
+              </label>
+              <textarea
+                className="w-full p-3 border rounded-lg bg-gray-50 text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Entrez une courte description..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-600 font-medium">
+                Mot de passe
+              </label>
               <input
                 type="password"
                 className="w-full p-3 border rounded-lg bg-gray-50 text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
