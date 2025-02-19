@@ -21,28 +21,6 @@ function Home() {
         <h1 className="text-3xl font-bold text-gray-800">
           Toutes les Recettes
         </h1>
-
-        <div>
-          {/* affichage de tous les recettes */}
-
-          {recipes.map((recipe) => (
-            <div key={recipe._id} className="bg-white shadow-md rounded-lg p-4">
-              <h2 className="text-xl font-semibold text-gray-700">
-                {recipe.title}
-              </h2>
-              <p className="text-gray-500">
-                {recipe.ingredients.slice(0, 50)}...
-              </p>
-              <Link
-                to={`/recipe/${recipe._id}`}
-                className="text-blue-500 hover:underline"
-              >
-                Voir la recette
-              </Link>
-            </div>
-          ))}
-        </div>
-
         {/* Bouton Ajouter une recette (visible seulement si l'utilisateur est connecté) */}
         {user && (
           <Link to="/add-recipe">
@@ -54,15 +32,28 @@ function Home() {
       </div>
 
       <div className="grid grid-cols-3 gap-6">
-        {/* {recipes.map((recipe) => (
+        {recipes.map((recipe) => (
           <div key={recipe._id} className="bg-white shadow-md rounded-lg p-4">
-            <h2 className="text-xl font-semibold text-gray-700">{recipe.title}</h2>
-            <p className="text-gray-500">{recipe.ingredients.slice(0, 50)}...</p>
-            <Link to={`/recipe/${recipe._id}`} className="text-blue-500 hover:underline">
+            {/* Ajout de l'image */}
+            <img
+              src={`http://localhost:5454${recipe.image}`} // Vérifie bien que ton serveur sert les images correctement
+              alt={recipe.title}
+              className="w-full h-40 object-cover rounded-lg mb-3"
+            />
+            <h2 className="text-xl font-semibold text-gray-700">
+              {recipe.title}
+            </h2>
+            <p className="text-gray-500">
+              {recipe.ingredients.slice(0, 50)}...
+            </p>
+            <Link
+              to={`/recipe/${recipe._id}`}
+              className="text-blue-500 hover:underline"
+            >
               Voir la recette
             </Link>
           </div>
-        ))} */}
+        ))}
       </div>
     </div>
   );
