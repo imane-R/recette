@@ -6,6 +6,7 @@ import Navbar from "./layout/Navbar";
 import Footer from "./layout/Footer";
 import AddRecipe from "./pages/AddRecipe";
 import Home from "./pages/Home";
+import Recipe from "./pages/Recipe";
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/add-recipe" element={<AddRecipe />} />
+            <Route path="*" element={<div>404 - Page non trouvée</div>} />
+            <Route path="/recipe/:id" element={<Recipe />} />
           </Routes>
         </div>
         <Footer />

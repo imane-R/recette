@@ -8,31 +8,38 @@ function AddRecipe() {
   const [title, setTitle] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [instructions, setInstructions] = useState("");
+  const [image, setImage] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const response = await fetch("http://localhost:5454/api/recipes", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-      body: JSON.stringify({
-        title,
-        ingredients,
-        instructions,
-        user: user._id,
-      }),
-    });
-
-    const data = await response.json();
-    console.log("tatatata ", data);
-    if (response.ok) {
-      console.log("yesy ", data);
+  
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("ingredients", ingredients);
+    formData.append("instructions", instructions);
+    formData.append("image", image);
+    formData.append("author", user._id); // Assurez-vous que `user` contient bien `_id`
+    formData.append("createdAt", new Date().toISOString()); // Corriger "createdAT" -> "createdAt"
+  
+    console.log("test test ");
+  
+    try {
+      const response = await fetch("http://localhost:5454/api/recipes/add", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formData, // Pas de Content-Type ici, FormData le gère automatiquement
+      });
+  
+      if (!response.ok) {
+        throw new Error("Erreur lors de l'ajout de la recette.");
+      }
+  
+      alert("Recette ajoutée avec succès !");
       navigate("/");
-    } else {
-      alert(data.message);
+    } catch (error) {
+      alert(error.message);
     }
   };
   return (
@@ -50,6 +57,18 @@ function AddRecipe() {
               placeholder="Nom de la recette"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </div>
+          <div
+            className="flex justify-between items-center"
+            style={{ marginBottom: "1rem" }}
+          >
+            <label className="block text-gray-600 font-medium">Image</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImage(e.target.files[0])}
               required
             />
           </div>
