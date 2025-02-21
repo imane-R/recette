@@ -10,8 +10,9 @@ function Recipe() {
   const { user, toggleFavorite } = useContext(AuthContext);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const [currentCommentPage, setCurrentCommentPage] = useState(1);
-  const [totalCommentPages, setTotalCommentPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,15 +27,17 @@ function Recipe() {
   // 📌 Récupérer les commentaires avec pagination
   useEffect(() => {
     fetch(
-      `http://localhost:5454/api/comments/${id}?page=${currentCommentPage}&limit=5`
+      `http://localhost:5454/api/comments/${id}?page=${currentPage}&limit=5`
     )
       .then((res) => res.json())
       .then((data) => {
         setComments(data.comments);
-        setTotalCommentPages(data.totalPages);
+        setTotalPages(data.totalPages);
       })
       .catch((err) => console.error("Erreur commentaires :", err));
-  }, [id, currentCommentPage]);
+  }, [id, currentPage]);
+
+  console.log("comments", comments);
 
   // 📌 Ajouter un commentaire
   const handleCommentSubmit = async (e) => {
@@ -201,32 +204,28 @@ function Recipe() {
                 <p className="text-gray-600">{comment.content}</p>
               </div>
             ))}
-          </div>
-          {/*  📌 Pagination des commentaires */}
-          <div className="flex justify-center mt-6 space-x-4">
-            <button
-              onClick={() =>
-                setCurrentCommentPage((prev) => Math.max(prev - 1, 1))
-              }
-              disabled={currentCommentPage === 1}
-              className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 disabled:opacity-50"
-            >
-              ◀️
-            </button>
-            <span className="text-gray-800 font-semibold">
-              Page {currentCommentPage} / {totalCommentPages}
-            </span>
-            <button
-              onClick={() =>
-                setCurrentCommentPage((prev) =>
-                  Math.min(prev + 1, totalCommentPages)
-                )
-              }
-              disabled={currentCommentPage === totalCommentPages}
-              className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 disabled:opacity-50"
-            >
-              ▶️
-            </button>
+            {/* 📌 Pagination des commentaires */}
+            <div className="flex justify-center mt-6 space-x-4">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 disabled:opacity-50"
+              >
+                ◀️
+              </button>
+              <span className="text-gray-800 font-semibold">
+                Page {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage >= totalPages}
+                className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 disabled:opacity-50"
+              >
+                ▶️
+              </button>
+            </div>
           </div>
         </div>
       </div>

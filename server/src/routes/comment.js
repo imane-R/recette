@@ -31,15 +31,18 @@ router.get("/:id", async (req, res) => {
   try {
     let { page, limit } = req.query;
     page = parseInt(page) || 1;
-    limit = parseInt(limit) || 5; // 5 commentaires par page
+    limit = parseInt(limit) || 5;
 
-    const total = await Comment.countDocuments({ recipeId: req.params.id });
+    const total = await Comment.countDocuments({ recipe: req.params.id });
 
-    const comments = await Comment.find({ recipeId: req.params.id })
-      .sort({ createdAt: -1 }) // Trier du plus récent au plus ancien
+    const comments = await Comment.find({ recipe: req.params.id })
+      .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
       .populate("author", "username");
+
+    console.log("📌 Nombre total de commentaires :", total);
+    console.log("📌 Nombre total de pages :", Math.ceil(total / limit));
 
     res.json({
       comments,
@@ -51,6 +54,5 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
-
 
 module.exports = router;
