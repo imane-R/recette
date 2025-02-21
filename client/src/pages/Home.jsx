@@ -4,16 +4,19 @@ import { AuthContext } from "../context/AuthContext";
 
 function Home() {
   const { user } = useContext(AuthContext);
-  console.log("tatatata ", user);
   const [recipes, setRecipes] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    // Récupérer toutes les recettes
-    fetch("http://localhost:5454/api/recipes/all")
+    fetch(`http://localhost:5454/api/recipes/all?page=${currentPage}&limit=6`)
       .then((res) => res.json())
-      .then((data) => setRecipes(data))
+      .then((data) => {
+        setRecipes(data.recipes);
+        setTotalPages(data.totalPages);
+      })
       .catch((err) => console.error(err));
-  }, []);
+  }, [currentPage]);
 
   return (
     <div className="container mx-auto p-6">
@@ -54,6 +57,28 @@ function Home() {
             </Link>
           </div>
         ))}
+      </div>
+      {/* Pagination */}
+      <div className="flex justify-center mt-6 space-x-4">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 disabled:opacity-50"
+        >
+          ◀️
+        </button>
+        <span className="text-gray-800 font-semibold">
+          Page {currentPage} / {totalPages}
+        </span>
+        <button
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 disabled:opacity-50"
+        >
+          ▶️
+        </button>
       </div>
     </div>
   );

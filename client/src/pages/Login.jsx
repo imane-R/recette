@@ -20,7 +20,7 @@ function Login() {
     const data = await response.json();
     if (response.ok) {
       login(data.token);
-      navigate("/profile");
+      navigate("/");
     } else {
       alert(data.message);
     }

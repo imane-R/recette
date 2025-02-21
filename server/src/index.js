@@ -5,6 +5,7 @@ const registerRoutes = require("./routes/register");
 const loginRoutes = require("./routes/login");
 const userRoutes = require("./routes/user");
 const recipeRoutes = require("./routes/recipe");
+const comment = require("./routes/comment");
 const mongoose = require("mongoose");
 
 require("dotenv").config();
@@ -35,3 +36,4 @@ app.use("/api/auth/register", registerRoutes);
 app.use("/api/auth/login", loginRoutes);
 app.use("/api/auth/user", userRoutes);
 app.use("/api/recipes", recipeRoutes);
+app.use("/api/comments", comment);

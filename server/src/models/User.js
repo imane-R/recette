@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   avatar: { type: String },
   description: { type: String },
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
 });
 
 module.exports = mongoose.model("User", UserSchema);

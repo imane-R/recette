@@ -6,7 +6,8 @@ const recipeSchema = new mongoose.Schema({
   instructions: { type: String, required: true },
   image: { type: String, required: true },
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  createdAT: { type: Date, default: Date.now }
+  createdAT: { type: Date, default: Date.now },
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }]
 });
 
 module.exports = mongoose.model("Recipe", recipeSchema);

@@ -56,14 +56,25 @@ router.post(
 // 📌 Route GET pour récupérer toutes les recettes  (sans authentification)
 router.get("/all", async (req, res) => {
   try {
-    const recipes = await Recipe.find().sort({ createdAt: -1 });
-    res.status(200).json(recipes);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des recettes :", error);
+    let { page, limit } = req.query;
+    page = parseInt(page) || 1; // Page actuelle (défaut : 1)
+    limit = parseInt(limit) || 6; // Nombre de recettes par page (défaut : 6)
+
+    const total = await Recipe.countDocuments(); // Compter le total des recettes
+    const recipes = await Recipe.find()
+      .skip((page - 1) * limit) // Sauter les recettes des pages précédentes
+      .limit(limit);
+
+    res.json({
+      recipes,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (err) {
+    console.error("Erreur récupération recettes :", err);
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
-
 // 📌 Route GET pour récupérer une recette par ID (sans authentification)
 
 router.get("/:id", async (req, res) => {

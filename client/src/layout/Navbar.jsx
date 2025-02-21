@@ -29,14 +29,6 @@ function Navbar() {
           >
             Recettes
           </Link>
-          {user && (
-            <Link
-              to="/saved"
-              className="text-black hover:text-gray-600 transition duration-300"
-            >
-              Recettes sauvegardées
-            </Link>
-          )}
           {user ? (
             <>
               <Link
@@ -85,7 +77,7 @@ function Navbar() {
             Accueil
           </Link>
           <Link
-            to="/recettes"
+            to="/"
             className="text-black hover:text-gray-600 transition duration-300"
             onClick={() => setIsOpen(false)}
           >
@@ -93,11 +85,11 @@ function Navbar() {
           </Link>
           {user && (
             <Link
-              to="/saved"
+              to="/favorites"
               className="text-black hover:text-gray-600 transition duration-300"
               onClick={() => setIsOpen(false)}
             >
-              Recettes sauvegardées
+              Recettes favorites
             </Link>
           )}
           {user ? (

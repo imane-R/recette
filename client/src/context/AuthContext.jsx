@@ -66,9 +66,39 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setUser(null);
   };
+  const toggleFavorite = async (recipeId) => {
+    if (!user) return alert("Connectez-vous pour ajouter aux favoris.");
+
+    try {
+      const response = await fetch(
+        `http://localhost:5454/api/auth/user/${user._id}/favorites`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ recipeId }),
+        }
+      );
+      console.log("recipeId", recipeId);
+      console.log("responseeeeeeee", response);
+      if (!response.ok)
+        throw new Error("Erreur lors de la mise à jour des favoris");
+
+      const data = await response.json();
+      console.log("🛠 Favoris mis à jour :", data.favorites);
+
+      setUser((prevUser) => ({ ...prevUser, favorites: data.favorites }));
+    } catch (error) {
+      console.error("Erreur favoris :", error);
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, loading, toggleFavorite }}
+    >
       {children}
     </AuthContext.Provider>
   );

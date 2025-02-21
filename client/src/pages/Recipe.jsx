@@ -7,7 +7,12 @@ import { AuthContext } from "../context/AuthContext";
 function Recipe() {
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
-  const { user } = useContext(AuthContext);
+  const { user, toggleFavorite } = useContext(AuthContext);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [currentCommentPage, setCurrentCommentPage] = useState(1);
+  const [totalCommentPages, setTotalCommentPages] = useState(1);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`http://localhost:5454/api/recipes/${id}`)
@@ -18,7 +23,47 @@ function Recipe() {
       );
   }, [id]);
 
-  // 📌 Récupérer l'utilisateur SEULEMENT si `recipe.author` est un ID et pas déjà un objet
+  // 📌 Récupérer les commentaires avec pagination
+  useEffect(() => {
+    fetch(
+      `http://localhost:5454/api/comments/${id}?page=${currentCommentPage}&limit=5`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setComments(data.comments);
+        setTotalCommentPages(data.totalPages);
+      })
+      .catch((err) => console.error("Erreur commentaires :", err));
+  }, [id, currentCommentPage]);
+
+  // 📌 Ajouter un commentaire
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!newComment.trim()) return;
+
+    try {
+      const response = await fetch("http://localhost:5454/api/comments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ content: newComment, recipeId: id }),
+      });
+
+      if (!response.ok)
+        throw new Error("Erreur lors de l'ajout du commentaire");
+
+      const data = await response.json();
+      setComments((prev) => [data.comment, ...prev]); // Ajoute le nouveau commentaire en haut
+      setNewComment(""); // Réinitialiser le champ
+    } catch (error) {
+      console.error("Erreur :", error);
+    }
+  };
+
+  // 📌 Récupérer l'utilisateur
   useEffect(() => {
     if (recipe && typeof recipe.author === "string") {
       fetch(`http://localhost:5454/api/auth/user/${recipe.author}`)
@@ -26,7 +71,7 @@ function Recipe() {
         .then((data) =>
           setRecipe((prevRecipe) => ({
             ...prevRecipe,
-            author: data, // ✅ Remplace l'ID par l'objet utilisateur
+            author: data,
           }))
         )
         .catch((err) =>
@@ -37,8 +82,6 @@ function Recipe() {
         );
     }
   }, [recipe?.author]);
-
-  const navigate = useNavigate();
 
   // 📌 Supprimer une recette
   const handleDelete = async () => {
@@ -104,10 +147,87 @@ function Recipe() {
                   </button>
                 </div>
               )}
+              {/* 📌 Bouton Ajouter/Supprimer des favoris */}
+              {user && (
+                <button
+                  onClick={() => toggleFavorite(recipe._id)}
+                  className={`px-4 py-2 mt-4 rounded-md text-white ${
+                    user.favorites?.includes(recipe._id)
+                      ? "bg-red-500"
+                      : "bg-blue-500"
+                  }`}
+                >
+                  {user.favorites?.includes(recipe._id)
+                    ? "❤️ Retirer des favoris"
+                    : "💙 Ajouter aux favoris"}
+                </button>
+              )}
             </div>
           ) : (
             <p className="text-gray-700">Chargement...</p>
           )}
+        </div>
+        {/* 📌 Section Commentaires */}
+        <div className="mt-6">
+          <h3 className="text-2xl font-semibold text-gray-700">Commentaires</h3>
+          {/* ✅ Formulaire pour ajouter un commentaire */}
+          {user && (
+            <form onSubmit={handleCommentSubmit} className="my-4">
+              <textarea
+                className="w-full p-2 border rounded-md"
+                placeholder="Ajoutez un commentaire..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                required
+              />
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded-md mt-2"
+              >
+                Commenter
+              </button>
+            </form>
+          )}
+          {/* ✅ Liste des commentaires */}
+          <div className="space-y-4">
+            {comments.map((comment) => (
+              <div key={comment._id} className="p-4 bg-gray-100 rounded-md">
+                <p className="font-semibold text-gray-800">
+                  {comment.author?.username}{" "}
+                  <span className="text-gray-500 text-sm">
+                    ({new Date(comment.createdAt).toLocaleDateString()})
+                  </span>
+                </p>
+                <p className="text-gray-600">{comment.content}</p>
+              </div>
+            ))}
+          </div>
+          {/*  📌 Pagination des commentaires */}
+          <div className="flex justify-center mt-6 space-x-4">
+            <button
+              onClick={() =>
+                setCurrentCommentPage((prev) => Math.max(prev - 1, 1))
+              }
+              disabled={currentCommentPage === 1}
+              className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 disabled:opacity-50"
+            >
+              ◀️
+            </button>
+            <span className="text-gray-800 font-semibold">
+              Page {currentCommentPage} / {totalCommentPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentCommentPage((prev) =>
+                  Math.min(prev + 1, totalCommentPages)
+                )
+              }
+              disabled={currentCommentPage === totalCommentPages}
+              className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 disabled:opacity-50"
+            >
+              ▶️
+            </button>
+          </div>
         </div>
       </div>
     </div>
